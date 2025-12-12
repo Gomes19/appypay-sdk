@@ -33,7 +33,7 @@ Para testar a SDK num outro projecto Laravel sem publicá-la no Packagist, adici
 A seguir instala a dependência:
 
 ```bash
-composer require gomesmateus/appypay-sdk:@dev
+composer require gomesmateus/appypay-sdk:^1.0.2
 ```
 
 > Ajusta o caminho em `url` para apontar para a pasta onde o SDK está clonado.
@@ -57,7 +57,7 @@ APPYPAY_BASE_URL=https://gwy-api.appypay.co.ao/v2.0
 APPYPAY_TOKEN_URL=https://auth.appypay.co.ao/connect/token
 APPYPAY_CLIENT_ID=xxxxxxxx
 APPYPAY_CLIENT_SECRET=xxxxxxxx
-APPYPAY_RESOURCE=https://gwy-api.appypay.co.ao
+APPYPAY_RESOURCE=xxxx
 APPYPAY_PAYMENT_METHOD_GPO_QR=GPO_xxx
 APPYPAY_PAYMENT_METHOD_GPO_EXPRESS=GPO_xxx
 APPYPAY_PAYMENT_METHOD_REFERENCE=REF_xxx
@@ -86,12 +86,15 @@ $client = app(AppyPayClient::class);
 ```php
 use AppyPay\DTO\Requests\CreateQrCodeRequest;
 
-o $response = $client->qrCodes()->create(new CreateQrCodeRequest(
-    amount: 2500.00,
-    currency: 'AOA',
-    merchantTransactionId: 'TX-' . uniqid(),
-    paymentMethod: config('appypay.payment_methods.gpo_qr'),
-    description: 'Pagamento de teste'
+$response = $client->qrCodes()->create(new CreateQrCodeRequest(
+  amount: 2500.00,
+  currency: 'AOA',
+  merchantTransactionId: 'TX-' . uniqid(),
+  paymentMethod: config('appypay.payment_methods.gpo_qr'),
+  description: 'Pagamento de teste via QR Code',
+  qrCodeType: 'SINGLE',
+  startDate: new \DateTime('2025-01-01 10:00:00'),
+  endDate: new \DateTime('2025-01-01 18:00:00')
 ));
 
 $qrCodeBase64 = $response->qrCodeArr;
@@ -101,18 +104,18 @@ $qrCodeBase64 = $response->qrCodeArr;
 
 ```php
 $charge = $client->charges()->createGpoPayment(
-    amount: 2500.00,
-    currency: 'AOA',
-    merchantTransactionId: 'TX-' . uniqid(),
-    description: 'Consulta',
-    phoneNumber: '244923000000',
-    notify: [
-        'name' => 'Cliente Teste',
-        'telephone' => '244923000000',
-        'email' => 'cliente@example.com',
-        'smsNotification' => true,
-        'emailNotification' => false,
-    ]
+  amount: 2500.00,
+  currency: 'AOA',
+  merchantTransactionId: 'TX-' . uniqid(),
+  description: 'Consulta de teste',
+  phoneNumber: '244923000000',
+  notify: [
+    'name' => 'Cliente Teste',
+    'telephone' => '244923000000',
+    'email' => 'cliente@example.com',
+    'smsNotification' => true,
+    'emailNotification' => false,
+  ]
 );
 
 $referenceNumber = $charge->reference()?->referenceNumber;
@@ -131,12 +134,12 @@ $status = $charge->responseStatus->status;
 use AppyPay\DTO\Requests\CreateChargeRequest;
 
 $charge = $client->charges()->create(new CreateChargeRequest(
-  amount: 2500.00,
-  currency: 'AOA',
-  merchantTransactionId: 'TX-' . uniqid(),
-  description: 'Pagamento por referência',
-  paymentMethod: config('appypay.payment_methods.ref'),
-  isAsync: true
+    amount: 2500.00,
+    currency: 'AOA',
+    merchantTransactionId: 'TX-' . uniqid(),
+    description: 'Pagamento por referência',
+    paymentMethod: config('appypay.payment_methods.ref'),
+    isAsync: true
 ));
 
 $referenceNumber = $charge->reference()?->referenceNumber;
