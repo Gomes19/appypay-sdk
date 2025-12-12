@@ -89,7 +89,7 @@ use AppyPay\DTO\Requests\CreateQrCodeRequest;
 $response = $client->qrCodes()->create(new CreateQrCodeRequest(
   amount: 2500.00,
   currency: 'AOA',
-  merchantTransactionId: 'TX-' . uniqid(),
+  merchantTransactionId: 'TEST' . time(),
   paymentMethod: config('appypay.payment_methods.gpo_qr'),
   description: 'Pagamento de teste via QR Code',
   qrCodeType: 'SINGLE',
@@ -106,7 +106,7 @@ $qrCodeBase64 = $response->qrCodeArr;
 $charge = $client->charges()->createGpoPayment(
   amount: 2500.00,
   currency: 'AOA',
-  merchantTransactionId: 'TX-' . uniqid(),
+  merchantTransactionId: 'TEST' . time(),
   description: 'Consulta de teste',
   phoneNumber: '244923000000',
   notify: [
@@ -136,7 +136,7 @@ use AppyPay\DTO\Requests\CreateChargeRequest;
 $charge = $client->charges()->create(new CreateChargeRequest(
     amount: 2500.00,
     currency: 'AOA',
-    merchantTransactionId: 'TX-' . uniqid(),
+    merchantTransactionId: 'TEST' . time(),
     description: 'Pagamento por referência',
     paymentMethod: config('appypay.payment_methods.ref'),
     isAsync: true
